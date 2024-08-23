@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}HoneyDo - Create Chore{% endblock %}
+
+{% block extra_head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded shadow-md" x-data="choreForm()">
+    <h1 class="text-3xl font-bold mb-6">Create a New Chore</h1>
+    <form hx-post="{% url 'create_chore' %}" hx-swap="outerHTML" x-on:submit="loading = true">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="id_title" class="block text-gray-700 text-sm font-bold mb-2">Title:</label>
+            <input type="text" name="title" id="id_title" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="id_description" class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
+            <textarea name="description" id="id_description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="3"></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="id_assigned_to" class="block text-gray-700 text-sm font-bold mb-2">Assigned to:</label>
+            <select name="assigned_to" id="id_assigned_to" multiple class="select2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-4">
+            <label for="id_due_date" class="block text-gray-700 text-sm font-bold mb-2">Due Date:</label>
+            <input type="text" name="due_date" id="id_due_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" x-ref="dueDatePicker">
+        </div>
+        <div class="mb-4">
+            <label for="id_priority" class="block text-gray-700 text-sm font-bold mb-2">Priority:</label>
+            <select name="priority" id="id_priority" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <option value="1">Low</option>
+                <option value="2">Medium</option>
+                <option value="3">High</option>
+            </select>
+        </div>
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" x-bind:disabled="loading">
+                <span x-show="!loading">Create Chore</span>
+                <span x-show="loading">Creating...</span>
+            </button>
+            <a href="{% url 'home' %}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+                Back to Home
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+function choreForm() {
+    return {
+        loading: false,
+        init() {
+            flatpickr(this.$refs.dueDatePicker, {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+            });
+            $(document).ready(function() {
+                $('.select2').select2();
+            });
+        }
+    }
+}
+</script>
+{% endblock %}

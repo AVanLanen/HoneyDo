@@ -1,0 +1,23 @@
+<div class="flex flex-col md:flex-row md:space-x-4">
+    <div class="w-full md:w-1/2 mb-4 md:mb-0">
+        <h2 class="text-2xl font-semibold mb-4">Your Assigned Chores</h2>
+        <ul class="bg-white shadow-md rounded-lg divide-y divide-gray-200 grid gap-4">
+            {% for chore in assigned_chores %}
+                {% include 'partials/chore_item.html' with chore=chore %}
+            {% empty %}
+                <li class="p-4 text-gray-500">No chores assigned to you yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="w-full md:w-1/2">
+        <h2 class="text-2xl font-semibold mb-4">Chores You Created</h2>
+        <ul class="bg-white shadow-md rounded-lg divide-y divide-gray-200 grid gap-4">
+            {% for chore in created_chores %}
+                {% include 'partials/chore_item.html' with chore=chore is_created=True %}
+            {% empty %}
+                <li class="p-4 text-gray-500">You haven't created any chores yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

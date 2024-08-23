@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}HoneyDo - {{ title }}{% endblock %}
+
+{% block extra_head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded shadow-md" x-data="choreForm()">
+    <h1 class="text-3xl font-bold mb-6">{{ title }}</h1>
+    <form method="post" x-on:submit="loading = true">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="{{ form.title.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Title:</label>
+            {{ form.title }}
+        </div>
+        <div class="mb-4">
+            <label for="{{ form.description.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
+            {{ form.description }}
+        </div>
+        <div class="mb-4">
+            <label for="{{ form.assigned_to.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Assigned to:</label>
+            {{ form.assigned_to }}
+        </div>
+        <div class="mb-4">
+            <label for="{{ form.due_date.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Due Date:</label>
+            {{ form.due_date }}
+        </div>
+        <div class="mb-4">
+            <label for="{{ form.priority.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Priority:</label>
+            {{ form.priority }}
+        </div>
+        <div class="mb-4">
+            <label for="{{ form.status.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Status:</label>
+            {{ form.status }}
+        </div>
+        <div class="flex items-center justify-between">
+            <a href="{% url 'home' %}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+                Back to Home
+            </a>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" x-bind:disabled="loading">
+                <span x-show="!loading">{{ submit_text }}</span>
+                <span x-show="loading">{{ loading_text }}...</span>
+            </button>
+        </div>
+    </form>
+
+    {% if chore %}
+    <div class="mt-8">
+        <h2 class="text-2xl font-bold mb-4">Additional Information</h2>
+        <p><strong>Created by:</strong> {{ chore.created_by.username }}</p>
+        <p><strong>Created at:</strong> {{ chore.created_at }}</p>
+        <p><strong>Updated at:</strong> {{ chore.updated_at }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function choreForm() {
+    return {
+        loading: false,
+        init() {
+            flatpickr(".flatpickr", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+            });
+            $(document).ready(function() {
+                $('.select2').select2();
+            });
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HoneyDo - Profile</title>
+</head>
+<body>
+    <h1>{{ request.user.username }}'s Profile</h1>
+    <p>Total Points: {{ profile.points }}</p>
+    
+    <h2>Completed Chores</h2>
+    <ul>
+        {% for chore in completed_chores %}
+            <li>{{ chore.title }} - Completed on: {{ chore.completed_at }}</li>
+        {% empty %}
+            <li>No completed chores yet.</li>
+        {% endfor %}
+    </ul>
+    
+    <a href="{% url 'home' %}">Back to Home</a>
+</body>
+</html>

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}HoneyDo - All Chores{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6">All Chores</h1>
+    <div class="overflow-x-auto">
+        <table id="choresTable" class="w-full bg-white shadow-md rounded-lg">
+            <thead>
+                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(0)">Title</th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(1)">Description</th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(2)">Created By</th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(3)">Assigned To</th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(4)">Due Date</th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(5)">Priority</th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(6)">Status</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-600 text-sm font-light">
+                {% for chore in chores %}
+                <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" onclick="window.location='{% url 'chore_details' chore.id %}'">
+                    <td class="py-3 px-6 text-left whitespace-nowrap">{{ chore.title }}</td>
+                    <td class="py-3 px-6 text-left">{{ chore.description }}</td>
+                    <td class="py-3 px-6 text-left">{{ chore.created_by.username }}</td>
+                    <td class="py-3 px-6 text-left">{% for user in chore.assigned_to.all %}{{ user.username }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                    <td class="py-3 px-6 text-left">{{ chore.due_date|default:"No due date" }}</td>
+                    <td class="py-3 px-6 text-left">{{ chore.get_priority_display }}</td>
+                    <td class="py-3 px-6 text-left">{{ chore.get_status_display }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    function sortTable(n) {
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        table = document.getElementById("choresTable");
+        switching = true;
+        dir = "asc";
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+                if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchcount ++;
+            } else {
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                }
+            }
+        }
+    }
+    </script>
+{% endblock %}

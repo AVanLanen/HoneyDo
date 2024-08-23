@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}HoneyDo - Home{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6">Welcome to HoneyDo, {{ request.user.username }}!</h1>
+    
+    <div id="chore-list">
+        {% include 'partials/chore_list.html' with assigned_chores=assigned_chores created_chores=created_chores %}
+    </div>
+{% endblock %}
