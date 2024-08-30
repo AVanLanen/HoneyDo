@@ -9,7 +9,7 @@
         <form class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4" method="post">
             {% csrf_token %}
             <div class="mb-6 text-center">
-                <img src="{% static 'images/logo.png' %}" alt="HoneyDo Logo" class="mx-auto h-32 mb-4"> <!-- Increased size to h-32 -->
+                <img src="{% static 'images/logo.png' %}" alt="HoneyDo Logo" class="mx-auto w-72 h-56">
                 <h2 class="text-2xl font-bold text-navy">Welcome Back!</h2>
                 <p class="text-sm text-gray-600">Please sign in to your account</p>
             </div>
@@ -29,9 +29,9 @@
                 <label class="block text-navy text-sm font-bold mb-2" for="{{ form.password.id_for_label }}">
                     Password
                 </label>
-                <div class="flex items-center">
+                <div class="relative">
                     {{ form.password }}
-                    <button type="button" class="ml-2 text-honey-accent hover:text-honey-dark focus:outline-none" onclick="togglePasswordVisibility()">
+                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-honey-accent hover:text-honey-dark focus:outline-none" onclick="togglePasswordVisibility()">
                         <i id="passwordToggleIcon" class="fas fa-eye"></i>
                     </button>
                 </div>

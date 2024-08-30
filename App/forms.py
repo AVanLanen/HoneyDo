@@ -29,6 +29,6 @@ class CustomAuthenticationForm(AuthenticationForm):
         'placeholder': 'Username',
     }))
     password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'class': 'shadow appearance-none border rounded w-full py-3 px-4 text-navy mb-3 leading-tight focus:outline-none focus:shadow-outline',
+        'class': 'shadow appearance-none border rounded w-full py-3 px-4 text-navy leading-tight focus:outline-none focus:shadow-outline',
         'placeholder': 'Password',
     }))
