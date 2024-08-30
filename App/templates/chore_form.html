@@ -3,10 +3,6 @@
 {% block title %}HoneyDo - {{ title }}{% endblock %}
 
 {% block extra_head %}
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 {% endblock %}
 
@@ -40,10 +36,10 @@
             {{ form.status }}
         </div>
         <div class="flex items-center justify-between">
-            <a href="{% url 'home' %}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+            <a href="{% url 'home' %}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out">
                 Back to Home
             </a>
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" x-bind:disabled="loading">
+            <button type="submit" class="bg-honey-dark hover:bg-honey-accent text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out" x-bind:disabled="loading">
                 <span x-show="!loading">{{ submit_text }}</span>
                 <span x-show="loading">{{ loading_text }}...</span>
             </button>
@@ -63,16 +59,7 @@
 <script>
 function choreForm() {
     return {
-        loading: false,
-        init() {
-            flatpickr(".flatpickr", {
-                enableTime: true,
-                dateFormat: "Y-m-d H:i",
-            });
-            $(document).ready(function() {
-                $('.select2').select2();
-            });
-        }
+        loading: false
     }
 }
 </script>

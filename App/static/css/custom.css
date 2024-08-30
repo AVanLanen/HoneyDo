@@ -1,0 +1,68 @@
+:root {
+    --honey-light: #FFF8E1;
+    --honey-medium: #FFE082;
+    --honey-dark: #FFB300;
+    --honey-accent: #FFA000;
+    --text-dark: #0e2f46;
+    --input-bg: #f3f4f6;  /* Soft gray for input backgrounds */
+}
+
+.bg-honey-light { background-color: var(--honey-light); }
+.bg-honey-medium { background-color: var(--honey-medium); }
+.bg-honey-dark { background-color: var(--honey-dark); }
+.text-honey-accent { color: var(--honey-accent); }
+.hover\:text-honey-accent:hover { color: var(--honey-accent); }
+.text-dark { color: var(--text-dark); }
+.text-navy { color: var(--text-dark); }
+
+/* Override Tailwind's text-gray classes */
+.text-gray-600, .text-gray-700, .text-gray-800, .text-gray-900 {
+    color: var(--text-dark);
+}
+
+.hover\:bg-honey-accent:hover { background-color: var(--honey-accent); }
+
+/* Custom focus styles for form inputs */
+.focus\:shadow-outline:focus {
+    box-shadow: 0 0 0 3px rgba(255, 160, 0, 0.5);
+}
+
+/* Custom styles for form inputs */
+input[type="text"],
+input[type="password"] {
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    background-color: var(--input-bg);
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.375rem;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: var(--honey-accent);
+    background-color: white;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 160, 0, 0.25);
+}
+
+/* Ensure the page fits on the screen */
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+    overflow-y: auto;
+}
+
+footer {
+    flex-shrink: 0;
+}

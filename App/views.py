@@ -1,12 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import logout, login
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.models import User
-from django.template.loader import render_to_string  # Add this import
+from django.template.loader import render_to_string
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncDate, TruncWeek, TruncMonth
+from django.utils import timezone
 from .models import Chore, UserProfile
 from .forms import ChoreForm, UserRegistrationForm
+import json  # Add this import
 
 @login_required
 def home(request):
@@ -40,8 +44,74 @@ def create_chore(request):
 @login_required
 def profile(request):
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-    completed_chores = Chore.objects.filter(assigned_to=request.user, status='completed')
-    return render(request, 'profile.html', {'profile': user_profile, 'completed_chores': completed_chores})
+    time_frame = request.GET.get('time_frame', 'month')
+    
+    if time_frame == 'week':
+        days_ago = 7
+        trunc_func = TruncDate('completed_at')
+    elif time_frame == 'month':
+        days_ago = 30
+        trunc_func = TruncDate('completed_at')
+    elif time_frame == '3months':
+        days_ago = 90
+        trunc_func = TruncWeek('completed_at')
+    elif time_frame == 'year':
+        days_ago = 365
+        trunc_func = TruncMonth('completed_at')
+    else:
+        days_ago = 30
+        trunc_func = TruncDate('completed_at')
+
+    start_date = timezone.now() - timezone.timedelta(days=days_ago)
+    
+    completed_chores = Chore.objects.filter(
+        assigned_to=request.user,
+        status='completed',
+        completed_at__gte=start_date
+    ).order_by('-completed_at')
+
+    # Calculate total completed chores for the selected time frame
+    total_completed_chores = completed_chores.count()
+    
+    # Calculate completion_data
+    completion_data = completed_chores.annotate(
+        date=trunc_func
+    ).values('date').annotate(count=Count('id')).order_by('date')
+
+    filled_completion_data = []
+    current_date = start_date
+    end_date = timezone.now()
+
+    while current_date <= end_date:
+        date_key = current_date.strftime("%Y-%m-%d")
+        count = next((item['count'] for item in completion_data if item['date'].strftime("%Y-%m-%d") == date_key), 0)
+        filled_completion_data.append({'date': date_key, 'count': count})
+        
+        if time_frame == 'year':
+            current_date += timezone.timedelta(days=32)
+            current_date = current_date.replace(day=1)
+        elif time_frame == '3months':
+            current_date += timezone.timedelta(weeks=1)
+        else:
+            current_date += timezone.timedelta(days=1)
+
+    # Calculate completion rate
+    total_chores = Chore.objects.filter(assigned_to=request.user, created_at__gte=start_date).count()
+    completion_rate = round((total_completed_chores / total_chores) * 100, 1) if total_chores > 0 else 0
+
+    context = {
+        'profile': user_profile,
+        'completed_chores': completed_chores[:5],  # Show only the 5 most recent
+        'completion_data': json.dumps(filled_completion_data),
+        'completion_rate': completion_rate,
+        'time_frame': time_frame,
+        'total_completed_chores': total_completed_chores
+    }
+
+    if request.htmx:
+        return render(request, 'partials/chore_chart.html', context)
+    
+    return render(request, 'profile.html', context)
 
 @require_http_methods(["GET", "POST"])
 def logout_view(request):
@@ -91,8 +161,11 @@ def update_chore_status(request, chore_id):
     chore = get_object_or_404(Chore, id=chore_id)
     new_status = request.POST.get('status')
     if new_status in dict(Chore.STATUS_CHOICES):
-        chore.status = new_status
-        chore.save()
+        if new_status == 'completed':
+            chore.mark_as_completed()
+        else:
+            chore.status = new_status
+            chore.save()
     return redirect('chore_details', chore_id=chore.id)
 
 @login_required
@@ -101,16 +174,19 @@ def update_chore_status_home(request, chore_id):
     if request.method == 'POST':
         new_status = request.POST.get('status')
         if new_status in dict(Chore.STATUS_CHOICES):
-            chore.status = new_status
-            chore.save()
+            if new_status == 'completed':
+                chore.mark_as_completed()
+            else:
+                chore.status = new_status
+                chore.save()
     
-    # Render both assigned and created chores
+    # Fetch all chores for the current user
     assigned_chores = Chore.objects.filter(assigned_to=request.user)
     created_chores = Chore.objects.filter(created_by=request.user)
     
-    html = render_to_string('partials/chore_list.html', {
+    context = {
         'assigned_chores': assigned_chores,
         'created_chores': created_chores
-    }, request=request)
+    }
     
-    return HttpResponse(html)
+    return render(request, 'partials/chore_list.html', context)

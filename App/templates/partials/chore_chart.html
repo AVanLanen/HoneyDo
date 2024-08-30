@@ -1,0 +1,79 @@
+<div id="area-chart"></div>
+
+<script>
+    var completionData = {{ completion_data|safe }};
+    var labels = completionData.map(item => item.date);
+    var data = completionData.map(item => item.count);
+    var timeFrame = "{{ time_frame }}";
+
+    var options = {
+        chart: {
+            height: 420,
+            type: 'area',
+            fontFamily: 'Inter, sans-serif',
+            foreColor: '#6B7280',
+            toolbar: {
+                show: false
+            }
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.9,
+                stops: [0, 90, 100]
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        tooltip: {
+            style: {
+                fontSize: '14px',
+                fontFamily: 'Inter, sans-serif'
+            },
+            x: {
+                format: timeFrame === 'year' ? 'yyyy-MM' : 'yyyy-MM-dd'
+            }
+        },
+        grid: {
+            show: false,
+        },
+        series: [
+            {
+                name: 'Chores Completed',
+                data: data,
+                color: '#1A56DB'
+            },
+        ],
+        xaxis: {
+            categories: labels,
+            type: 'datetime',
+            axisBorder: {
+                show: false
+            },
+            axisTicks: {
+                show: false
+            },
+            tooltip: {
+                enabled: false
+            },
+            labels: {
+                format: timeFrame === 'year' ? 'MMM yyyy' : 
+                        timeFrame === '3months' ? 'dd MMM' : 'dd MMM',
+                rotateAlways: timeFrame === 'month' || timeFrame === 'week'
+            }
+        },
+        yaxis: {
+            labels: {
+                formatter: function (value) {
+                    return Math.round(value);
+                }
+            }
+        }
+    }
+
+    var chart = new ApexCharts(document.querySelector("#area-chart"), options);
+    chart.render();
+</script>
